@@ -4,6 +4,9 @@
 #include <time.h>
 #include <math.h>
 #include <time.h>
+#include <conio.h>
+
+#include "algos/tsp_ilp.c"
 
 #define MAX_NODE 15
 #define MAX_CITY_LEN 256
@@ -34,9 +37,23 @@ int main(){
         fp = fopen(nama_file, "r");
     }
 
+    // Array of Kota (nama, latitude, longitude)
     Kota arrKota[MAX_NODE];
-    float Graph[MAX_NODE][MAX_NODE];
 
+    // Array of nama kota
+    char** kotaName = (char **)malloc(MAX_NODE * sizeof(char *));
+    for(int i=0;i<MAX_NODE;i++){
+        kotaName[i] = (char *)malloc(MAX_CITY_LEN * sizeof(char));
+    }
+
+    // Adjacency Matrix
+    float **adjMat;
+    adjMat = (float **)malloc(MAX_NODE * sizeof(float *));
+    for(int i=0;i<MAX_NODE;i++){
+        adjMat[i] = (float *)malloc(MAX_NODE * sizeof(float));
+    }
+
+    // Parsing isi file ke adjMatrix, dll
     char buf[1005];
     char* token;
     int idx = 0;
@@ -44,6 +61,7 @@ int main(){
         Kota newKota;
         token = strtok(buf, ",");
         strcpy(newKota.name, token);
+        strcpy(kotaName[idx], token);
         token = strtok(NULL, ",");
         newKota.latitude = atof(token);
         token = strtok(NULL, ",");
@@ -54,16 +72,18 @@ int main(){
     int N = idx;
     for(int i=0;i<N;i++){
         for(int j=0;j<N;j++){
-            Graph[i][j] = calcDistance(arrKota[i].latitude, arrKota[i].longitude, arrKota[j].latitude, arrKota[j].longitude);
+            adjMat[i][j] = calcDistance(arrKota[i].latitude, arrKota[i].longitude, arrKota[j].latitude, arrKota[j].longitude);
         }
     }
     // Debug
     // for(int i=0;i<N;i++){
     //     for(int j=0;j<N;j++){
-    //         printf("%f ", Graph[i][j]);
+    //         printf("%f ", adjMat[i][j]);
     //     }
     //     printf("\n");
     // }
+
+    // Input Kota awal
     printf("\033[2J\033[1;1H");
     char kotaStart[MAX_CITY_LEN];
     int startNode = -1;
@@ -82,9 +102,9 @@ int main(){
         }
     }
 
-
+    // UI Menu
     int inp;
-    char menu[8][100] = {"Algo1", "Algo2", "Algo3", "Algo4", "Algo5", "Algo6", "Algo7", "Exit"};
+    char menu[8][100] = {"Algo1", "Algo2", "Algo3", "Algo4", "Algo5", "Algo6", "Algoritma Integer Linear Programming", "Exit"};
     clock_t now; double dt;
     while(1){
         printf("\033[2J\033[1;1H");
@@ -117,7 +137,7 @@ int main(){
         }else if(inp == 6){
             // use algo6
         }else if(inp == 7){
-            // use algo7
+            tspILP(N, adjMat, kotaName);
         }
         dt = (double)(clock()-now)/CLOCKS_PER_SEC;
         printf("Waktu komputasi  : %f detik\n", dt);
