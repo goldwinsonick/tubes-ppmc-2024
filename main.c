@@ -7,6 +7,7 @@
 #include <conio.h>
 
 #include "algos/tsp_ilp.c"
+#include "algos/tsp_greedy.c"
 
 #define MAX_NODE 15
 #define MAX_CITY_LEN 256
@@ -24,8 +25,9 @@ float calcDistance(float lat1, float long1, float lat2, float long2){
 }
 
 int main(){
+    // Input File
     char nama_file[256];
-    printf("\033[2J\033[1;1H");
+    // printf("\033[2J\033[1;1H");
     printf("Masukkan namafile: ");
     scanf("%[^\n]s", nama_file);
     FILE* fp = fopen(nama_file, "r");
@@ -125,7 +127,7 @@ int main(){
         printf("\033[2J\033[1;1H");
         now = clock();
         if(inp == 1){
-            // use algo1
+            tspGreedy(N, adjMat, kotaName, startNode);
         }else if(inp == 2){
             // use algo2
         }else if(inp == 3){
