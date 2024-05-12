@@ -1,6 +1,6 @@
 # Tubes PPMC 2024
 
-## Persoalan : Traveling Salsemen
+## Persoalan : Traveling Salesmen Problem
 
 ### Deskripsi
 Diberikan list kota-kota yang disimpan pada sebuah file. Setiap kota memiliki informasi Latitude dan Longitude. Dicari 
@@ -25,7 +25,7 @@ git clone https://github.com/goldwinsonick/tubes-ppmc-2024.git
 ### 2. Buat branch baru
 ```
 git checkout -b <nama-branch>
-# Misal <nama-branch> : astar
+# Misal <nama-branch> : bfs
 
 git branch
 # untuk check kita ada di branch apa
