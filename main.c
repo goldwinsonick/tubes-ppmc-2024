@@ -8,9 +8,11 @@
 
 #include "algos/tsp_ilp.c"
 #include "algos/tsp_greedy.c"
+#include "algos/tsp_bfs.c"
 
 #define MAX_NODE 15
 #define MAX_CITY_LEN 256
+#define M_PI 3.14159265358979323846
 
 typedef struct Kota{
     char name[MAX_CITY_LEN];
@@ -18,10 +20,15 @@ typedef struct Kota{
     float longitude;
 }Kota;
 
-float calcDistance(float lat1, float long1, float lat2, float long2){
-    // Haversine
-    float r = 6371;
-    return 2*r*asin(sin((lat2-lat1)/2)*sin((lat2-lat1)/2) + cos(lat1)*cos(lat2)*sin((long2-long1)/2)*sin((long2-long1)/2));
+float calcDistance(float lat1, float long1, float lat2, float long2) {
+    // Haversine formula
+    const float R = 6371; // Earth radius in kilometers
+    float dLat = (lat2 - lat1) * M_PI / 180.0;
+    float dLong = (long2 - long1) * M_PI / 180.0;
+    float a = sin(dLat / 2) * sin(dLat / 2) + cos(lat1 * M_PI / 180.0) * cos(lat2 * M_PI / 180.0) * sin(dLong / 2) * sin(dLong / 2);
+    float c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    float distance = R * c;
+    return distance;
 }
 
 int main(){
@@ -74,7 +81,9 @@ int main(){
     int N = idx;
     for(int i=0;i<N;i++){
         for(int j=0;j<N;j++){
-            adjMat[i][j] = calcDistance(arrKota[i].latitude, arrKota[i].longitude, arrKota[j].latitude, arrKota[j].longitude);
+            double distance = calcDistance(arrKota[i].latitude, arrKota[i].longitude, arrKota[j].latitude, arrKota[j].longitude);
+            adjMat[i][j] = distance;
+            //adjMat[j][i] = distance;
         }
     }
     // Debug
@@ -106,7 +115,7 @@ int main(){
 
     // UI Menu
     int inp;
-    char menu[8][100] = {"Algo1", "Algo2", "Algo3", "Algo4", "Algo5", "Algo6", "Algoritma Integer Linear Programming", "Exit"};
+    char menu[8][100] = {"Algo1", "Algoritma Breadth First Search (BFS)", "Algo3", "Algo4", "Algo5", "Algo6", "Algoritma Integer Linear Programming", "Exit"};
     clock_t now; double dt;
     while(1){
         printf("\033[2J\033[1;1H");
@@ -129,7 +138,7 @@ int main(){
         if(inp == 1){
             tspGreedy(N, adjMat, kotaName, startNode);
         }else if(inp == 2){
-            // use algo2
+            tspBFS(N, adjMat, kotaName, startNode);
         }else if(inp == 3){
             // use algo3
         }else if(inp == 4){
