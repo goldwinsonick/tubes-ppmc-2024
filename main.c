@@ -10,7 +10,7 @@
 #include "algos/tsp_greedy.c"
 #include "algos/tsp_bfs.c"
 
-#define MAX_NODE 15
+#define MAX_NODE 20
 #define MAX_CITY_LEN 256
 #define M_PI 3.14159265358979323846
 
@@ -79,6 +79,12 @@ int main(){
         idx++;
     }
     int N = idx;
+    if (N<6 || N>15){
+        printf("\033[2J\033[1;1H");
+        printf("Jumlah kota harus 6-15!\n");
+        return 0;
+    }
+
     for(int i=0;i<N;i++){
         for(int j=0;j<N;j++){
             double distance = calcDistance(arrKota[i].latitude, arrKota[i].longitude, arrKota[j].latitude, arrKota[j].longitude);
