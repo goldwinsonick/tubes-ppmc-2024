@@ -3,7 +3,9 @@
 #include <time.h>
 #include <float.h>
 
-#define MAX_NODE 15
+#ifndef MAX_NODE
+    #define MAX_NODE 15
+#endif
 
 #define MAX_ITER 1000000
 #define W 0.5
@@ -168,7 +170,7 @@ void tspPSO(int N, float **adjMat, int startNode, char **kotaName) {
         // printf("\n_____\n");
         // debug(particles, gbest, N);
     }
-    debug(particles, gbest, N);
+    // debug(particles, gbest, N);
     int startIdx = 0;
     for(int i=0; i<N; i++){
         if(gbest->route[i] == startNode){
@@ -183,27 +185,3 @@ void tspPSO(int N, float **adjMat, int startNode, char **kotaName) {
     printf("%s\n", kotaName[gbest->route[startIdx]]);
     printf("Panjang rute: %f\n", gbest->dist);
 }
-
-// int main(){
-//     srand(time(NULL));
-//     // make this as matrix
-//     // {0.000000 838.623474 311.299713 567.658386
-//     // 838.623474 0.000000 533.906555 284.516510
-//     // 311.299713 533.906555 0.000000 256.851563
-//     // 567.658386 284.516510 256.851563 0.000000}
-//     float adjMat[4][4] = {
-//         {0.000000, 838.623474, 311.299713, 567.658386},
-//         {838.623474, 0.000000, 533.906555, 284.516510},
-//         {311.299713, 533.906555, 0.000000, 256.851563},
-//         {567.658386, 284.516510, 256.851563, 0.000000}
-//     };
-//     // make the matrix array to double pointer
-//     float **adjMatPtr = (float **)malloc(4 * sizeof(float *));
-//     for(int i=0; i<4; i++){
-//         adjMatPtr[i] = (float *)malloc(4 * sizeof(float));
-//         for(int j=0; j<4; j++){
-//             adjMatPtr[i][j] = adjMat[i][j];
-//         }
-//     }
-//     tspPSO(4, adjMatPtr, 0);
-// }

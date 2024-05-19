@@ -3,7 +3,9 @@
 #include <float.h>
 #include <limits.h>
 
-#define MAX_NODE 15
+#ifndef MAX_NODE
+    #define MAX_NODE 15
+#endif
 
 // Fungsi swap elemen untuk kegunaan permutasi
 void swap(int* x, int* y) {

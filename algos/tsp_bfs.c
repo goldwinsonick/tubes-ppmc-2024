@@ -3,7 +3,9 @@
 #include <string.h>
 #include <math.h>
 
-#define MAX_NODE 20
+#ifndef MAX_NODE
+    #define MAX_NODE 20
+#endif
 
 void tspBFS(int N, float **adjMat, char **arrKotaName, int startNode) {
     bool visited[MAX_NODE] = {false};

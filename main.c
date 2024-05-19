@@ -6,12 +6,15 @@
 #include <time.h>
 #include <conio.h>
 
-#include "algos/tsp_ilp.c"
 #include "algos/tsp_pso.c"
 #include "algos/tsp_greedy.c"
 #include "algos/tsp_bruteforce.c"
+#include "algos/tsp_genetic.c"
+#include "algos/tsp_bfs.c"
 
-#define MAX_NODE 20
+#ifndef MAX_NODE
+    #define MAX_NODE 15
+#endif
 #define MAX_CITY_LEN 256
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
@@ -33,7 +36,6 @@ float calcDistance(float lat1, float long1, float lat2, float long2) {
     float distance = R * c;
     return distance;
 }
-
 
 int main(){
     // Input File
@@ -64,13 +66,11 @@ int main(){
         scanf(" %[^\n]s", nama_file);
         fp = fopen(nama_file, "r");
         while(fp == NULL){
-            printf("\033[2J\033[1;1H");
             printf("Nama file tidak ditemukan!\n");
             printf("Masukkan namafile: ");
             scanf(" %[^\n]s", nama_file);
             fp = fopen(nama_file, "r");
         }
-
 
         // Parsing isi file ke adjMatrix, dll
         char buf[1005];
@@ -90,7 +90,6 @@ int main(){
         }
         N = idx;
         if(N <= 6 || N >= 15){
-            // printf("\033[2J\033[1;1H");
             printf("Jumlah kota harus 6 <= N <= 15 !\n");
             N = -1;
         }
@@ -100,22 +99,17 @@ int main(){
         for(int j=0;j<N;j++){
             double distance = calcDistance(arrKota[i].latitude, arrKota[i].longitude, arrKota[j].latitude, arrKota[j].longitude);
             adjMat[i][j] = distance;
-            //adjMat[j][i] = distance;
         }
     }
-    // Debug
-    // for(int i=0;i<N;i++){
-    //     for(int j=0;j<N;j++){
-    //         printf("%f ", adjMat[i][j]);
-    //     }
-    //     printf("\n");
-    // }
 
     // Input Kota awal
-    printf("\033[2J\033[1;1H");
     char kotaStart[MAX_CITY_LEN];
     int startNode = -1;
+    printf("\033[2J\033[1;1H");
     while(startNode == -1){
+        for(int i=0; i<N;i++){
+            printf("%d. %s\n", i+1, arrKota[i].name);
+        }
         printf("Masukkan kota awal: ");
         scanf(" %[^\n]s", kotaStart);
         for(int i=0; i<N; i++){
@@ -132,7 +126,7 @@ int main(){
 
     // UI Menu
     int inp;
-    char menu[8][100] = {"Algoritma Greedy", "Algoritma Breadth First Search (BFS)", "Algo3", "Algo4", "Algo5", "Algo6", "Particle Swarm Optimization", "Exit"};
+    char menu[8][100] = {"Greedy", "Bruteforce", "Breadth First Search (BFS)", "Depth First Search (DFS)*", "Branch and Bound*", "Genetic", "Particle Swarm Optimization", "Exit"};
     clock_t now; double dt;
     while(1){
         printf("\033[2J\033[1;1H");
@@ -165,9 +159,10 @@ int main(){
         }else if(inp == 6){
             tspGenetic(N, adjMat, kotaName, startNode);
         }else if(inp == 7){
-            tspILP(N, adjMat, kotaName);
-        }else if(inp == 7){
             tspPSO(N, adjMat, startNode, kotaName);
+        }else{
+            printf("Input tidak valid!\n");
+            continue;
         }
         dt = (double)(clock()-now)/CLOCKS_PER_SEC;
         printf("Waktu komputasi  : %f detik\n", dt);

@@ -10,7 +10,7 @@
 #define GENERATIONS 1000
 
 // Fungsi utilitas untuk menghitung jarak antara dua titik
-float calculateDistance(float** adjMat, int* route, int N) {
+float calculateDistanceG(float** adjMat, int* route, int N) {
     float totalDistance = 0.0;
     for (int i = 0; i < N - 1; i++) {
         totalDistance += adjMat[route[i]][route[i+1]];
@@ -73,7 +73,7 @@ void tspGenetic(int N, float** adjMat, char** kotaName, int startNode) {
 
     for (int gen = 0; gen < GENERATIONS; gen++) {
         for (int i = 0; i < POPULATION_SIZE; i++) {
-            fitness[i] = calculateDistance(adjMat, population[i], N);
+            fitness[i] = calculateDistanceG(adjMat, population[i], N);
         }
 
         selectBest(population, fitness, bestRoute, N);
@@ -89,7 +89,7 @@ void tspGenetic(int N, float** adjMat, char** kotaName, int startNode) {
     for (int i = 0; i < N; i++) {
         printf("%s ", kotaName[bestRoute[i]]);
     }
-    printf("\nBest route distance: %f km\n", calculateDistance(adjMat, bestRoute, N));
+    printf("\nBest route distance: %f km\n", calculateDistanceG(adjMat, bestRoute, N));
 
     // Dealokasi memori
     for (int i = 0; i < POPULATION_SIZE; i++) {
