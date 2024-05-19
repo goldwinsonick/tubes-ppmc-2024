@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 void tspGreedy(int N, float **adjMat, char **arrKotaName, int startNode){
     // Inisialisasi
     int visited[N];
@@ -23,5 +24,8 @@ void tspGreedy(int N, float **adjMat, char **arrKotaName, int startNode){
         printf(" -> %s", arrKotaName[nextNode]);
         currNode = nextNode;
     }
+    // Add distance to return to the starting city
+    totalDist += adjMat[currNode][startNode];
+    printf(" -> %s", arrKotaName[startNode]);
     printf("\nTotal Jarak: %f\n", totalDist);
 }
