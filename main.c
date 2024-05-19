@@ -9,7 +9,7 @@
 #include "algos/tsp_ilp.c"
 #include "algos/tsp_pso.c"
 #include "algos/tsp_greedy.c"
-#include "algos/tsp_bfs.c"
+#include "algos/tsp_bruteforce.c"
 
 #define MAX_NODE 20
 #define MAX_CITY_LEN 256
@@ -21,7 +21,7 @@ typedef struct Kota{
     char name[MAX_CITY_LEN];
     float latitude;
     float longitude;
-}Kota;
+} Kota;
 
 float calcDistance(float lat1, float long1, float lat2, float long2) {
     // Haversine formula
@@ -33,6 +33,7 @@ float calcDistance(float lat1, float long1, float lat2, float long2) {
     float distance = R * c;
     return distance;
 }
+
 
 int main(){
     // Input File
@@ -154,9 +155,9 @@ int main(){
         if(inp == 1){
             tspGreedy(N, adjMat, kotaName, startNode);
         }else if(inp == 2){
-            tspBFS(N, adjMat, kotaName, startNode);
+            tspBruteforce(N, adjMat, kotaName, startNode);
         }else if(inp == 3){
-            // use algo3
+            tspBFS(N, adjMat, kotaName, startNode);
         }else if(inp == 4){
             // use algo4
         }else if(inp == 5){
