@@ -50,3 +50,4 @@ void tspGreedy(int N, float **adjMat, char **arrKotaName, int startNode) {
     printf(" -> %s\n", arrKotaName[startNode]);
     printf("Total jarak: %.2f km\n", totalDistance);
 }
+

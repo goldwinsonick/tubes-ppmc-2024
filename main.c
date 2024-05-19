@@ -7,10 +7,15 @@
 #include <conio.h>
 
 #include "algos/tsp_ilp.c"
+#include "algos/tsp_pso.c"
 #include "algos/tsp_greedy.c"
+#include "algos/tsp_bfs.c"
 
-#define MAX_NODE 15
+#define MAX_NODE 20
 #define MAX_CITY_LEN 256
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
 
 typedef struct Kota{
     char name[MAX_CITY_LEN];
@@ -18,26 +23,21 @@ typedef struct Kota{
     float longitude;
 }Kota;
 
-float calcDistance(float lat1, float long1, float lat2, float long2){
-    // Haversine
-    float r = 6371;
-    return 2*r*asin(sin((lat2-lat1)/2)*sin((lat2-lat1)/2) + cos(lat1)*cos(lat2)*sin((long2-long1)/2)*sin((long2-long1)/2));
+float calcDistance(float lat1, float long1, float lat2, float long2) {
+    // Haversine formula
+    const float R = 6371; // Earth radius in kilometers
+    float dLat = (lat2 - lat1) * M_PI / 180.0;
+    float dLong = (long2 - long1) * M_PI / 180.0;
+    float a = sin(dLat / 2) * sin(dLat / 2) + cos(lat1 * M_PI / 180.0) * cos(lat2 * M_PI / 180.0) * sin(dLong / 2) * sin(dLong / 2);
+    float c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    float distance = R * c;
+    return distance;
 }
 
 int main(){
     // Input File
     char nama_file[256];
-    // printf("\033[2J\033[1;1H");
-    printf("Masukkan namafile: ");
-    scanf("%[^\n]s", nama_file);
-    FILE* fp = fopen(nama_file, "r");
-    while(fp == NULL){
-        printf("\033[2J\033[1;1H");
-        printf("Nama file tidak ditemukan!\n");
-        printf("Masukkan namafile: ");
-        scanf(" %[^\n]s", nama_file);
-        fp = fopen(nama_file, "r");
-    }
+    FILE *fp;
 
     // Array of Kota (nama, latitude, longitude)
     Kota arrKota[MAX_NODE];
@@ -56,26 +56,50 @@ int main(){
         adjMat[i] = (float *)malloc(MAX_NODE * sizeof(float));
     }
 
-    // Parsing isi file ke adjMatrix, dll
-    char buf[1005];
-    char* token;
-    int idx = 0;
-    while(fgets(buf, 1000, fp)){
-        Kota newKota;
-        token = strtok(buf, ",");
-        strcpy(newKota.name, token);
-        strcpy(kotaName[idx], token);
-        token = strtok(NULL, ",");
-        newKota.latitude = atof(token);
-        token = strtok(NULL, ",");
-        newKota.longitude = atof(token);
-        arrKota[idx] = newKota;
-        idx++;
+    int N = -1;
+    printf("\033[2J\033[1;1H");
+    while(N == -1){
+        printf("Masukkan namafile: ");
+        scanf(" %[^\n]s", nama_file);
+        fp = fopen(nama_file, "r");
+        while(fp == NULL){
+            printf("\033[2J\033[1;1H");
+            printf("Nama file tidak ditemukan!\n");
+            printf("Masukkan namafile: ");
+            scanf(" %[^\n]s", nama_file);
+            fp = fopen(nama_file, "r");
+        }
+
+
+        // Parsing isi file ke adjMatrix, dll
+        char buf[1005];
+        char* token;
+        int idx = 0;
+        while(fgets(buf, 1000, fp)){
+            Kota newKota;
+            token = strtok(buf, ",");
+            strcpy(newKota.name, token);
+            strcpy(kotaName[idx], token);
+            token = strtok(NULL, ",");
+            newKota.latitude = atof(token);
+            token = strtok(NULL, ",");
+            newKota.longitude = atof(token);
+            arrKota[idx] = newKota;
+            idx++;
+        }
+        N = idx;
+        if(N <= 6 || N >= 15){
+            // printf("\033[2J\033[1;1H");
+            printf("Jumlah kota harus 6 <= N <= 15 !\n");
+            N = -1;
+        }
     }
-    int N = idx;
+
     for(int i=0;i<N;i++){
         for(int j=0;j<N;j++){
-            adjMat[i][j] = calcDistance(arrKota[i].latitude, arrKota[i].longitude, arrKota[j].latitude, arrKota[j].longitude);
+            double distance = calcDistance(arrKota[i].latitude, arrKota[i].longitude, arrKota[j].latitude, arrKota[j].longitude);
+            adjMat[i][j] = distance;
+            //adjMat[j][i] = distance;
         }
     }
     // Debug
@@ -107,7 +131,7 @@ int main(){
 
     // UI Menu
     int inp;
-    char menu[8][100] = {"Algoritma Greedy", "Algo2", "Algo3", "Algo4", "Algo5", "Algo6", "Algoritma Integer Linear Programming", "Exit"};
+    char menu[8][100] = {"Algoritma Greedy", "Algoritma Breadth First Search (BFS)", "Algo3", "Algo4", "Algo5", "Algo6", "Particle Swarm Optimization", "Exit"};
     clock_t now; double dt;
     while(1){
         printf("\033[2J\033[1;1H");
@@ -130,7 +154,7 @@ int main(){
         if(inp == 1){
             tspGreedy(N, adjMat, kotaName, startNode);
         }else if(inp == 2){
-            // use algo2
+            tspBFS(N, adjMat, kotaName, startNode);
         }else if(inp == 3){
             // use algo3
         }else if(inp == 4){
@@ -138,9 +162,11 @@ int main(){
         }else if(inp == 5){
             // use algo5
         }else if(inp == 6){
-            // use algo6
+            tspGenetic(N, adjMat, kotaName, startNode);
         }else if(inp == 7){
             tspILP(N, adjMat, kotaName);
+        }else if(inp == 7){
+            tspPSO(N, adjMat, startNode, kotaName);
         }
         dt = (double)(clock()-now)/CLOCKS_PER_SEC;
         printf("Waktu komputasi  : %f detik\n", dt);
