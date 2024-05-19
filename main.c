@@ -37,17 +37,7 @@ float calcDistance(float lat1, float long1, float lat2, float long2) {
 int main(){
     // Input File
     char nama_file[256];
-    printf("\033[2J\033[1;1H");
-    printf("Masukkan namafile: ");
-    scanf("%[^\n]s", nama_file);
-    FILE* fp = fopen(nama_file, "r");
-    while(fp == NULL){
-        printf("\033[2J\033[1;1H");
-        printf("Nama file tidak ditemukan!\n");
-        printf("Masukkan namafile: ");
-        scanf(" %[^\n]s", nama_file);
-        fp = fopen(nama_file, "r");
-    }
+    FILE *fp;
 
     // Array of Kota (nama, latitude, longitude)
     Kota arrKota[MAX_NODE];
@@ -65,27 +55,43 @@ int main(){
         adjMat[i] = (float *)malloc(MAX_NODE * sizeof(float));
     }
 
-    // Parsing isi file ke adjMatrix, dll
-    char buf[1005];
-    char* token;
-    int idx = 0;
-    while(fgets(buf, 1000, fp)){
-        Kota newKota;
-        token = strtok(buf, ",");
-        strcpy(newKota.name, token);
-        strcpy(kotaName[idx], token);
-        token = strtok(NULL, ",");
-        newKota.latitude = atof(token);
-        token = strtok(NULL, ",");
-        newKota.longitude = atof(token);
-        arrKota[idx] = newKota;
-        idx++;
-    }
-    int N = idx;
-    if (N<6 || N>15){
-        printf("\033[2J\033[1;1H");
-        printf("Jumlah kota harus 6-15!\n");
-        return 0;
+    int N = -1;
+    printf("\033[2J\033[1;1H");
+    while(N == -1){
+        printf("Masukkan namafile: ");
+        scanf(" %[^\n]s", nama_file);
+        fp = fopen(nama_file, "r");
+        while(fp == NULL){
+            printf("\033[2J\033[1;1H");
+            printf("Nama file tidak ditemukan!\n");
+            printf("Masukkan namafile: ");
+            scanf(" %[^\n]s", nama_file);
+            fp = fopen(nama_file, "r");
+        }
+
+
+        // Parsing isi file ke adjMatrix, dll
+        char buf[1005];
+        char* token;
+        int idx = 0;
+        while(fgets(buf, 1000, fp)){
+            Kota newKota;
+            token = strtok(buf, ",");
+            strcpy(newKota.name, token);
+            strcpy(kotaName[idx], token);
+            token = strtok(NULL, ",");
+            newKota.latitude = atof(token);
+            token = strtok(NULL, ",");
+            newKota.longitude = atof(token);
+            arrKota[idx] = newKota;
+            idx++;
+        }
+        N = idx;
+        if(N <= 6 || N >= 15){
+            // printf("\033[2J\033[1;1H");
+            printf("Jumlah kota harus 6 <= N <= 15 !\n");
+            N = -1;
+        }
     }
 
     for(int i=0;i<N;i++){
