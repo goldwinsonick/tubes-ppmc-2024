@@ -51,6 +51,7 @@ int main(){
     // Adjacency Matrix
     float **adjMat;
     adjMat = (float **)malloc(MAX_NODE * sizeof(float *));
+
     for(int i=0;i<MAX_NODE;i++){
         adjMat[i] = (float *)malloc(MAX_NODE * sizeof(float));
     }
@@ -130,7 +131,7 @@ int main(){
 
     // UI Menu
     int inp;
-    char menu[8][100] = {"Algo1", "Algoritma Breadth First Search (BFS)", "Algo3", "Algo4", "Algo5", "Algo6", "Particle Swarm Optimization", "Exit"};
+    char menu[8][100] = {"Algoritma Greedy", "Algoritma Breadth First Search (BFS)", "Algo3", "Algo4", "Algo5", "Algo6", "Particle Swarm Optimization", "Exit"};
     clock_t now; double dt;
     while(1){
         printf("\033[2J\033[1;1H");
