@@ -7,10 +7,14 @@
 #include <conio.h>
 
 #include "algos/tsp_ilp.c"
+#include "algos/tsp_pso.c"
 #include "algos/tsp_greedy.c"
 
 #define MAX_NODE 15
 #define MAX_CITY_LEN 256
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
 
 typedef struct Kota{
     char name[MAX_CITY_LEN];
@@ -18,16 +22,21 @@ typedef struct Kota{
     float longitude;
 }Kota;
 
-float calcDistance(float lat1, float long1, float lat2, float long2){
-    // Haversine
-    float r = 6371;
-    return 2*r*asin(sin((lat2-lat1)/2)*sin((lat2-lat1)/2) + cos(lat1)*cos(lat2)*sin((long2-long1)/2)*sin((long2-long1)/2));
+float calcDistance(float lat1, float long1, float lat2, float long2) {
+    // Haversine formula
+    const float R = 6371; // Earth radius in kilometers
+    float dLat = (lat2 - lat1) * M_PI / 180.0;
+    float dLong = (long2 - long1) * M_PI / 180.0;
+    float a = sin(dLat / 2) * sin(dLat / 2) + cos(lat1 * M_PI / 180.0) * cos(lat2 * M_PI / 180.0) * sin(dLong / 2) * sin(dLong / 2);
+    float c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    float distance = R * c;
+    return distance;
 }
 
 int main(){
     // Input File
     char nama_file[256];
-    // printf("\033[2J\033[1;1H");
+    printf("\033[2J\033[1;1H");
     printf("Masukkan namafile: ");
     scanf("%[^\n]s", nama_file);
     FILE* fp = fopen(nama_file, "r");
@@ -106,7 +115,7 @@ int main(){
 
     // UI Menu
     int inp;
-    char menu[8][100] = {"Algo1", "Algo2", "Algo3", "Algo4", "Algo5", "Algo6", "Algoritma Integer Linear Programming", "Exit"};
+    char menu[8][100] = {"Algo1", "Algo2", "Algo3", "Algo4", "Algo5", "Algo6", "Particle Swarm Optimization", "Exit"};
     clock_t now; double dt;
     while(1){
         printf("\033[2J\033[1;1H");
@@ -137,9 +146,9 @@ int main(){
         }else if(inp == 5){
             // use algo5
         }else if(inp == 6){
-            // use algo6
-        }else if(inp == 7){
             tspILP(N, adjMat, kotaName);
+        }else if(inp == 7){
+            tspPSO(N, adjMat, startNode, kotaName);
         }
         dt = (double)(clock()-now)/CLOCKS_PER_SEC;
         printf("Waktu komputasi  : %f detik\n", dt);
