@@ -161,6 +161,8 @@ int main(){
         }else if(inp == 5){
             // use algo5
         }else if(inp == 6){
+            tspGenetic(N, adjMat, kotaName, startNode);
+        }else if(inp == 7){
             tspILP(N, adjMat, kotaName);
         }else if(inp == 7){
             tspPSO(N, adjMat, startNode, kotaName);
