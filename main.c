@@ -8,6 +8,7 @@
 
 #include "algos/tsp_ilp.c"
 #include "algos/tsp_greedy.c"
+#include "algos/tsp_genetic.c"
 
 #define MAX_NODE 15
 #define MAX_CITY_LEN 256
@@ -137,7 +138,7 @@ int main(){
         }else if(inp == 5){
             // use algo5
         }else if(inp == 6){
-            // use algo6
+            tspGenetic(N, adjMat, kotaName, startNode);
         }else if(inp == 7){
             tspILP(N, adjMat, kotaName);
         }
