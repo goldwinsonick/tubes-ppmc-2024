@@ -8,21 +8,34 @@
 
 #include "algos/tsp_ilp.c"
 #include "algos/tsp_greedy.c"
+#include "algos/tsp_bruteforce.c"
 
 #define MAX_NODE 15
 #define MAX_CITY_LEN 256
+#define pi 22/7
 
 typedef struct Kota{
     char name[MAX_CITY_LEN];
     float latitude;
     float longitude;
-}Kota;
+} Kota;
 
-float calcDistance(float lat1, float long1, float lat2, float long2){
+// float calcDistance(float lat1, float long1, float lat2, float long2){
+//     // Haversine
+//     float r = 6371;
+//     return 2*r*asin(sin((lat2-lat1)/2)*sin((lat2-lat1)/2) + cos(lat1)*cos(lat2)*sin((long2-long1)/2)*sin((long2-long1)/2));
+// }
+
+float calcDistance(float lat1, float long1, float lat2, float long2) {
     // Haversine
     float r = 6371;
-    return 2*r*asin(sin((lat2-lat1)/2)*sin((lat2-lat1)/2) + cos(lat1)*cos(lat2)*sin((long2-long1)/2)*sin((long2-long1)/2));
+    lat1 = lat1 * pi / 180.0;
+    long1 = long1 * pi / 180.0;
+    lat2 = lat2 * pi / 180.0;
+    long2 = long2 * pi / 180.0;
+    return 2*r*asin(sqrt(pow(sin((lat2-lat1)/2), 2) + cos(lat1)*cos(lat2)*pow(sin((long2-long1)/2), 2)));
 }
+
 
 int main(){
     // Input File
@@ -129,7 +142,7 @@ int main(){
         if(inp == 1){
             tspGreedy(N, adjMat, kotaName, startNode);
         }else if(inp == 2){
-            // use algo2
+            tspBruteforce(N, adjMat, kotaName, startNode);
         }else if(inp == 3){
             // use algo3
         }else if(inp == 4){
