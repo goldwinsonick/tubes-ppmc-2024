@@ -13,7 +13,7 @@
 #include "algos/tsp_bfs.c"
 
 #ifndef MAX_NODE
-    #define MAX_NODE 15
+    #define MAX_NODE 100
 #endif
 #define MAX_CITY_LEN 256
 #ifndef M_PI
@@ -60,7 +60,7 @@ int main(){
     }
 
     int N = -1;
-    // printf("\033[2J\033[1;1H");
+    printf("\033[2J\033[1;1H");
     while(N == -1){
         printf("Masukkan namafile: ");
         scanf(" %[^\n]s", nama_file);
@@ -89,9 +89,29 @@ int main(){
             idx++;
         }
         N = idx;
+        // Check N sesuai batasan
         if(N < 6 || N > 15){
-            printf("Jumlah kota harus 6 <= N <= 15 !\n");
-            N = -1;
+            if(N > MAX_NODE){
+                printf("Jumlah kota terlalu banyak! Maksimal 100 kota\n");
+                N = -1;
+                continue;
+            }
+
+            printf("Jumlah kota direkomendasikan 6 <= N <= 15 !\n");
+            printf("Jumlah kota sekarang: %d\n", N);
+            char confirmInp[1000];
+            printf("Apakah kamu yakin mau lanjut? (y/n): ");
+            scanf(" %[^\n]s", confirmInp);
+            while(strcmp(confirmInp, "y")!=0 && strcmp(confirmInp, "n")!=0){
+                printf("Input tidak valid!\n");
+                printf("Apakah kamu yakin mau lanjut? (y/n): ");
+                scanf(" %[^\n]s", confirmInp);
+            }
+            if(strcmp(confirmInp,"y")==0){
+                break;
+            }else{
+                N = -1;
+            }
         }
     }
 
