@@ -1,4 +1,4 @@
-// algos/tsp_genetic.c
+// Algoritma Genetika untuk TSP oleh Farrel (13222071)
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

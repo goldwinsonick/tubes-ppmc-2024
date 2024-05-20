@@ -1,3 +1,4 @@
+// Algortima Greedy untuk TSP oeh Karunia (13222073)
 #include <stdio.h>
 #include <stdbool.h>
 #include <float.h>
