@@ -4,7 +4,7 @@
 #include <float.h>
 
 #ifndef MAX_NODE
-    #define MAX_NODE 15
+    #define MAX_NODE 100
 #endif
 
 // PSO Constants (Ini berdasar Eberhart & Shi, 2001)
@@ -200,10 +200,10 @@ void tspPSO(int N, float **adjMat, int startNode, char **kotaName, int max_iter)
             break;
         }
     }
-    printf("Rute:\n");
+    printf("Rute Ditemukan:\n");
     for(int i=0; i<N; i++){
         printf("%s -> ", kotaName[gbest->route[(startIdx+i)%N]]);
     }
     printf("%s\n", kotaName[gbest->route[startIdx]]);
-    printf("Panjang rute: %f\n", gbest->dist);
+    printf("Panjang Rute: %f\n", gbest->dist);
 }
