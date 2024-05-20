@@ -11,6 +11,7 @@
 #include "algos/tsp_bruteforce.c"
 #include "algos/tsp_genetic.c"
 #include "algos/tsp_bfs.c"
+#include "algos/tsp_dfs.c"
 
 #ifndef MAX_NODE
     #define MAX_NODE 100
@@ -146,7 +147,7 @@ int main(){
 
     // UI Menu
     int inp;
-    char menu[8][100] = {"Greedy", "Bruteforce", "Breadth First Search (BFS)", "Depth First Search (DFS)*", "Branch and Bound*", "Genetic", "Particle Swarm Optimization", "Exit"};
+    char menu[8][100] = {"Greedy", "Bruteforce", "Breadth First Search (BFS)", "Depth First Search (DFS)", "Branch and Bound*", "Genetic", "Particle Swarm Optimization", "Exit"};
     clock_t now; double dt;
     while(1){
         printf("\033[2J\033[1;1H");
@@ -167,13 +168,13 @@ int main(){
         printf("\033[2J\033[1;1H");
         now = clock();
         if(inp == 1){
-            tspGreedy(N, adjMat, kotaName, startNode);
+            //tspGreedy(N, adjMat, kotaName, startNode);
         }else if(inp == 2){
             tspBruteforce(N, adjMat, kotaName, startNode);
         }else if(inp == 3){
             tspBFS(N, adjMat, kotaName, startNode);
         }else if(inp == 4){
-            // use algo4
+            tspDFS(N, adjMat, kotaName, startNode);
         }else if(inp == 5){
             // use algo5
         }else if(inp == 6){
