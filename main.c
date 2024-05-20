@@ -60,7 +60,7 @@ int main(){
     }
 
     int N = -1;
-    printf("\033[2J\033[1;1H");
+    // printf("\033[2J\033[1;1H");
     while(N == -1){
         printf("Masukkan namafile: ");
         scanf(" %[^\n]s", nama_file);
@@ -89,7 +89,7 @@ int main(){
             idx++;
         }
         N = idx;
-        if(N <= 6 || N >= 15){
+        if(N < 6 || N > 15){
             printf("Jumlah kota harus 6 <= N <= 15 !\n");
             N = -1;
         }
@@ -159,7 +159,14 @@ int main(){
         }else if(inp == 6){
             tspGenetic(N, adjMat, kotaName, startNode);
         }else if(inp == 7){
-            tspPSO(N, adjMat, startNode, kotaName);
+            int max_iter = -1;
+            while(!(1 <= max_iter && max_iter <= 10000000)){
+                printf("Semakin besar jumlah iterasi, semakin akurat hasilnya, tetapi semakin lama prosesnya\n");
+                printf("Masukkan jumlah iterasi (1-10000000): ");
+                scanf("%d", &max_iter);
+            }
+            now = clock();
+            tspPSO(N, adjMat, startNode, kotaName, max_iter);
         }else{
             printf("Input tidak valid!\n");
             continue;

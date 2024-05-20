@@ -7,19 +7,20 @@
     #define MAX_NODE 15
 #endif
 
-#define MAX_ITER 1000000
-#define W 0.5
-#define C1 1.0
-#define C2 1.0
+// PSO Constants (Ini berdasar Eberhart & Shi, 2001)
+#define W 0.729
+#define C1 1.49445
+#define C2 1.49445
 
 // Particle struct
 typedef struct Particle{
+    float pos[MAX_NODE];
     int route[MAX_NODE];
     float dist;
-    float pbest[MAX_NODE];
     float vel[MAX_NODE];
+    float pbest[MAX_NODE];
+    float pbest_dist;
 } Particle;
-
 
 void debug(Particle **particles, Particle *gbest, int N){
     for(int i=0; i<N; i++){
@@ -46,74 +47,85 @@ void debug(Particle **particles, Particle *gbest, int N){
     printf("%f\n", gbest->dist);
 }
 
+// @brief Update route dan dist berdasarkan pos (bisa untuk pos, pbest, dan gbest)
+void updateRouteAndDist(float *pos, int *route, float *dist, float **adjMat, int N){
+    // Reset route awal
+    for(int i=0;i<N;i++){
+        route[i] = i;
+    }
+    // Bubble sort route berdasar pos (Tanpa merubah pos)
+    float tempPos[MAX_NODE];
+    for(int i=0; i<N; i++){
+        tempPos[i] = pos[i];
+    }
+    for(int i=0; i<N; i++){
+        for(int j=0; j<N-1; j++){
+            if(tempPos[j] > tempPos[j+1]){
+                // Swap pos
+                float temp = tempPos[j];
+                tempPos[j] = tempPos[j+1];
+                tempPos[j+1] = temp;
+                // Swap route
+                int tempRoute = route[j];
+                route[j] = route[j+1];
+                route[j+1] = tempRoute;
+            }
+        }
+    }
+    // Hitung dist
+    *dist = 0;
+    for(int i=0; i<N; i++){
+        *dist += adjMat[route[i]][route[(i+1)%N]];
+    }
+}
+
+void updatePbest(Particle **particles, int N){
+    for (int i=0; i<N; i++){
+        if (particles[i]->dist < particles[i]->pbest_dist){
+            particles[i]->pbest_dist = particles[i]->dist;
+            for (int j=0; j<N; j++){
+                particles[i]->pbest[j] = particles[i]->pos[j];
+            }
+        }
+    }
+}
+
 void updateGbest(Particle **particles, Particle* gbest, int N){
     for (int i=0; i<N; i++){
         if (particles[i]->dist < gbest->dist){
             gbest->dist = particles[i]->dist;
             for (int j=0; j<N; j++){
-                gbest->pbest[j] = particles[i]->pbest[j];
+                gbest->pos[j] = particles[i]->pos[j];
+                gbest->route[j] = particles[i]->route[j];
             }
         }
     }
 }
 
-void updateParticleRouteAndDist(Particle **particles, float **adjMat, int N){
-    float tempPbest[MAX_NODE];
-    for(int i=0; i<N; i++){
-        // Route awal
-        for(int j=0; j<N; j++){
-            particles[i]->route[j] = j;
-        }
-
-        // Bubble sort berdasar tempPbest
-        for(int j=0; j<N; j++){
-            tempPbest[j] = particles[i]->pbest[j];
-        }
-        for(int j=0; j<N; j++){
-            for(int k=j+1; k<N; k++){
-                if(tempPbest[j] > tempPbest[k]){
-                    // swap tempPbest
-                    float temp = tempPbest[j];
-                    tempPbest[j] = tempPbest[k];
-                    tempPbest[k] = temp;
-                    // swap route
-                    int temp2 = particles[i]->route[j];
-                    particles[i]->route[j] = particles[i]->route[k];
-                    particles[i]->route[k] = temp2;
-                }
-            }
-        }
-        // Hitung dist routenya
-        particles[i]->dist = 0;
-        for (int j=0; j<N; j++){
-            particles[i]->dist += adjMat[particles[i]->route[j]][particles[i]->route[(j+1)%N]];
-        }
-    }
-
-
-}
-
-// Generate particle awal
 Particle** initParticle(int N, Particle* gbest, float **adjMat){
-    // Inisialisasi particles (pbest)
+    // Inisialisasi particles
     Particle **particles = (Particle **)malloc(N * sizeof(Particle *));
 
     for (int i=0; i<N; i++){
         particles[i] = (Particle *)malloc(sizeof(Particle));
+        // Generate pos dan pbest awal
         // Ini random number 0-1 untuk setiap cell
         for (int j=0; j<N; j++){
-            particles[i]->pbest[j] = (float)rand() / (float)RAND_MAX;
+            particles[i]->pos[j] = (float)rand() / (float)RAND_MAX;
+            // Awalnya pos dan pbest sama
+            particles[i]->pbest[j] = particles[i]->pos[j];
         }
-
-
         // Generate velocity awal
         for (int j=0; j<N; j++){
             particles[i]->vel[j] = 0.1;
         }
     }
 
-    // Generate route dan dist
-    updateParticleRouteAndDist(particles, adjMat, N);
+    // Generate route dan dist untuk pos dan pbest
+    for(int i=0; i<N; i++){
+        updateRouteAndDist(particles[i]->pos, particles[i]->route, &particles[i]->dist, adjMat, N);
+        particles[i]->pbest_dist = particles[i]->dist; // pbest dan dist masih sama
+    }
 
     // Evaluasi gbest
     gbest->dist = particles[0]->dist;
@@ -128,46 +140,56 @@ void updateVel(Particle **particles, Particle* gbest, int N){
     for (int i=0; i<N; i++){
         for (int j=0; j<N; j++){
             // V(t+1) = W * V(t) + C1 * rand() * (pbest - x(t)) + C2 * rand() * (gbest - x(t))
-            particles[i]->vel[j] = W * particles[i]->vel[j] + C1 * ((float)rand() / (float)RAND_MAX) * (particles[i]->pbest[j] - particles[i]->pbest[j]) + C2 * ((float)rand() / (float)RAND_MAX) * (gbest->pbest[j] - particles[i]->pbest[j]);
+            particles[i]->vel[j] = W * particles[i]->vel[j] + C1 * ((float)rand() / (float)RAND_MAX) * (particles[i]->pbest[j] - particles[i]->pos[j]) + C2 * ((float)rand() / (float)RAND_MAX) * (gbest->pos[j] - particles[i]->pbest[j]);
         }
     }
 }
-void updatePbest(Particle **particles, int N){
-    // Update pbest
+void updatePos(Particle **particles, int N){
+    // Update Pos
     for (int i=0; i<N; i++){
         for (int j=0; j<N; j++){
-            particles[i]->pbest[j] += particles[i]->vel[j];
+            particles[i]->pos[j] += particles[i]->vel[j];
         }
     }
-    // Normalisasi pbest
+
+    // Normalisasi pos agar nilainya 0-1
     for(int i=0; i<N; i++){
-        float maxPbest = particles[i]->pbest[0];
-        float minPbest = particles[i]->pbest[0];
+        // Cari max dan min nilai pos
+        float maxPos = particles[i]->pos[0];
+        float minPos = particles[i]->pos[0];
         for(int j=0; j<N; j++){
-            if (particles[i]->pbest[j] < minPbest){
-                minPbest = particles[i]->pbest[j];
+            if (particles[i]->pos[j] < minPos){
+                minPos = particles[i]->pos[j];
             }
-            if (particles[i]->pbest[j] > maxPbest){
-                maxPbest = particles[i]->pbest[j];
+            if (particles[i]->pos[j] > maxPos){
+                maxPos = particles[i]->pos[j];
             }
         }
+        // Normalisasi dengan rumus (x - min) / (max - min)
         for(int j=0; j<N; j++){
-            particles[i]->pbest[j] = (particles[i]->pbest[j] - minPbest) / (maxPbest - minPbest);
+            particles[i]->pos[j] = (particles[i]->pos[j] - minPos) / (maxPos - minPos);
         }
     }
 }
 
-void tspPSO(int N, float **adjMat, int startNode, char **kotaName) {
+void tspPSO(int N, float **adjMat, int startNode, char **kotaName, int max_iter) {
+
     // Inisialisasi gbest
+    // Ini bagusnya sebenarnya bikin struct baru terdiri dari N(pos[N],vel[N]), N(pbest[N],pbest_vel[N]) dan Gbest
+    // Tapi ini pakai struct particle aja gbest yang dipakai hanya pos, dist, dan route saja
     Particle* gbest = (Particle *)malloc(sizeof(Particle));
-    // Generate random pbest dan route awal dan update gbest
+    // Inisiaisasi particles
     Particle **particles = initParticle(N, gbest, adjMat);
     // debug(particles, gbest, N);
-    for(int i=0; i<MAX_ITER; i++){
+    for(int i=0; i<max_iter; i++){
         updateVel(particles, gbest, N);
+        updatePos(particles, N);
+        // Update route dan dist dari pos
+        for(int j=0; j<N; j++){
+            updateRouteAndDist(particles[j]->pos, particles[j]->route, &particles[j]->dist, adjMat, N);
+        }
         updatePbest(particles, N);
         updateGbest(particles, gbest, N);
-        // printf("\n_____\n");
         // debug(particles, gbest, N);
     }
     // debug(particles, gbest, N);
