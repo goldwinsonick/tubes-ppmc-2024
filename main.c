@@ -6,9 +6,9 @@
 #include <time.h>
 #include <conio.h>
 
-//#include "algos/tsp_pso.c"
+#include "algos/tsp_pso.c"
 #include "algos/tsp_greedy.c"
-//#include "algos/tsp_bruteforce.c"
+#include "algos/tsp_bruteforce.c"
 #include "algos/tsp_genetic.c"
 #include "algos/tsp_bfs.c"
 #include "algos/tsp_dfs.c"
@@ -147,7 +147,7 @@ int main(){
 
     // UI Menu
     int inp;
-    char menu[8][100] = {"Greedy", "Bruteforce", "Breadth First Search (BFS)", "Depth First Search (DFS)*", "Branch and Bound*", "Genetic", "Particle Swarm Optimization", "Exit"};
+    char menu[8][100] = {"Greedy", "Bruteforce", "Breadth First Search (BFS)", "Depth First Search (DFS)", "Branch and Bound*", "Genetic", "Particle Swarm Optimization", "Exit"};
     clock_t now; double dt;
     while(1){
         printf("\033[2J\033[1;1H");
@@ -170,24 +170,24 @@ int main(){
         if(inp == 1){
             //tspGreedy(N, adjMat, kotaName, startNode);
         }else if(inp == 2){
-            //tspBruteforce(N, adjMat, kotaName, startNode);
+            tspBruteforce(N, adjMat, kotaName, startNode);
         }else if(inp == 3){
-            //tspBFS(N, adjMat, kotaName, startNode);
+            tspBFS(N, adjMat, kotaName, startNode);
         }else if(inp == 4){
             tspDFS(N, adjMat, kotaName, startNode);
         }else if(inp == 5){
             // use algo5
         }else if(inp == 6){
-            //tspGenetic(N, adjMat, kotaName, startNode);
+            tspGenetic(N, adjMat, kotaName, startNode);
         }else if(inp == 7){
-            // int max_iter = -1;
-            // while(!(1 <= max_iter && max_iter <= 10000000)){
-            //     printf("Semakin besar jumlah iterasi, semakin akurat hasilnya, tetapi semakin lama prosesnya\n");
-            //     printf("Masukkan jumlah iterasi (1-10000000): ");
-            //     scanf("%d", &max_iter);
-            // }
-            // now = clock();
-            // tspPSO(N, adjMat, startNode, kotaName, max_iter);
+            int max_iter = -1;
+            while(!(1 <= max_iter && max_iter <= 10000000)){
+                printf("Semakin besar jumlah iterasi, semakin akurat hasilnya, tetapi semakin lama prosesnya\n");
+                printf("Masukkan jumlah iterasi (1-10000000): ");
+                scanf("%d", &max_iter);
+            }
+            now = clock();
+            tspPSO(N, adjMat, startNode, kotaName, max_iter);
         }else{
             printf("Input tidak valid!\n");
             continue;
