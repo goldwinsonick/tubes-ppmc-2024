@@ -168,7 +168,7 @@ int main(){
         printf("\033[2J\033[1;1H");
         now = clock();
         if(inp == 1){
-            //tspGreedy(N, adjMat, kotaName, startNode);
+            tspGreedy(N, adjMat, kotaName, startNode);
         }else if(inp == 2){
             tspBruteforce(N, adjMat, kotaName, startNode);
         }else if(inp == 3){
